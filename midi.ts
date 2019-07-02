@@ -3,7 +3,6 @@ import * as Types from "./types";
 
 export function parseMidi(midiByteBuffer: ArrayBuffer): Types.MidiFileData {
     var parser = new BytesParser(midiByteBuffer);
-
     let header = parseFileHeader(parser.parseChunk());
     let tracks: Types.Track[] = [];
 
