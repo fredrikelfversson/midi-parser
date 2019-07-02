@@ -50,6 +50,7 @@ function parseTrack(Chunk: Types.Chunk): Types.Track {
                 let sysexSize: number = parser.parseVLQ();
                 let sysexBytes: number[] = parser.parseBytes(sysexSize);  
                 let sysexEvent: Types.TrackEvent = parseSysexEvent({ deltaTime, absoluteTime, sysexType: statusByte, bytes: sysexBytes });
+                
                 events.push(sysexEvent)
                 break;
             //META-EVENT
@@ -58,8 +59,11 @@ function parseTrack(Chunk: Types.Chunk): Types.Track {
                 let metaSize: number = parser.parseVLQ();
                 let metaBytes: number[] = parser.parseBytes(metaSize);
                 let metaEvent: Types.TrackEvent = parseMetaEvent({ deltaTime, absoluteTime, metaType, size: metaSize, bytes: metaBytes });
+                
                 if(metaEvent.type === "setTempo") { tempo = (<Types.MetaTempoEvent>metaEvent).msPerQuarterNote };
+                
                 events.push(metaEvent);
+                
                 break;
             //MIDI-EVENT | RUNNING STATUS | UNKNOWN EVENT
             default:
@@ -85,12 +89,13 @@ function parseTrack(Chunk: Types.Chunk): Types.Track {
                 events.push(midiEvent);
                 
                 break;        
-        };
-    };
+        }
+    }
 
     if (trackChunkSize !== parser.checkSum) { 
         throw new Error("Expected track size is not equal to actual track size: " + parser.checkSum + "/" + trackChunkSize ); 
-    };
+    }
+    
     return { id: Chunk.id, size: Chunk.size, ticksDuration: absoluteTime, tempo, events };
 }
 
